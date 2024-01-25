@@ -62,8 +62,6 @@ COPY ./docker/nginx/error.html /var/www/html/error.html
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/private.key -out /etc/nginx/ssl/public.crt -subj "/C=BR/ST=Sao_Paulo/L=Porto_Ferreira/O=Brothers_Barbearia/OU=Barbeiros/CN=api.brothersbarbearia.com.br"
 
 
-
-
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # RUN apt update -y && apt install nano git -y
 
