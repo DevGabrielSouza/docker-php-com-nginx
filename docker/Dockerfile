@@ -50,7 +50,7 @@ RUN composer install --no-interaction
 
 RUN apt-get install nginx -y
 RUN rm -rf /etc/nginx/sites-enabled/* && rm -rf /etc/nginx/sites-available/*
-COPY ./docker/nginx/sites.conf /etc/nginx/sites-enabled/default.conf
+COPY ./docker/nginx/sites.conf /etc/nginx/sites-enabled/default
 COPY ./docker/nginx/error.html /var/www/html/error.html
 
 # Configuração do Nginx com SSL
