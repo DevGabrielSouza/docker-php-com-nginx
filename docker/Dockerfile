@@ -7,12 +7,12 @@ ARG APP_DIR=/var/www/app
 ## Versão da Lib do Redis para PHP
 ARG REDIS_LIB_VERSION=5.3.7
 
-### apt-utils é um extensão de recursos do gerenciador de pacotes APT
+### apt-utils é uma extensão de recursos do gerenciador de pacotes APT
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     apt-utils \ 
     supervisor
 
-# dependências recomendadas de desenvolvido para ambiente linux
+# Dependências recomendadas para ambiente Linux
 RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libzip-dev \
@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql pdo_pgsql pgsql session xml
 
-# habilita instalação do Redis
+# Habilita a instalação do Redis
 RUN pecl install redis-${REDIS_LIB_VERSION} \
     && docker-php-ext-enable redis 
 
@@ -34,6 +34,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 COPY ./docker/supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./docker/supervisord/conf /etc/supervisord.d/
+
 ### Supervisor permite monitorar e controlar vários processos (LINUX)
 ### Bastante utilizado para manter processos em Daemon, ou seja, executando em segundo plano
 
@@ -48,21 +49,20 @@ COPY --chown=www-data:www-data ./app .
 RUN rm -rf vendor
 RUN composer install --no-interaction
 
-RUN apt-get install nginx -y
+# Instalação do Nginx e Certbot
+RUN apt-get install nginx certbot python3-certbot-nginx -y
 RUN rm -rf /etc/nginx/sites-enabled/* && rm -rf /etc/nginx/sites-available/*
+
+# Configuração do Nginx
 COPY ./docker/nginx/sites.conf /etc/nginx/sites-enabled/default
 COPY ./docker/nginx/error.html /var/www/html/error.html
 
-# Configuração do Nginx com SSL
-COPY ./docker/nginx/error.html /var/www/html/error.html
-
+# Configuração do Certbot para obter e configurar certificados
 RUN mkdir -p /etc/nginx/ssl
+RUN certbot --nginx --non-interactive --agree-tos --domains api.brothersbarbearia.com.br --email seu_email@example.com
 
-# Geração de certificado SSL (substitua pelos seus próprios certificados em produção)
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/private.key -out /etc/nginx/ssl/public.crt -subj "/C=BR/ST=Sao_Paulo/L=Porto_Ferreira/O=Brothers_Barbearia/OU=Barbeiros/CN=api.brothersbarbearia.com.br"
-
-
+# Limpeza do apt
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-# RUN apt update -y && apt install nano git -y
 
+# Comandos finais
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
