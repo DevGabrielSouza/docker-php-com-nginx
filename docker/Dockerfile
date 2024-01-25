@@ -54,8 +54,6 @@ COPY ./docker/nginx/sites.conf /etc/nginx/sites-enabled/default
 COPY ./docker/nginx/error.html /var/www/html/error.html
 
 # Configuração do Nginx com SSL
-RUN rm /etc/nginx/sites-enabled/default \
-&& ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 COPY ./docker/nginx/error.html /var/www/html/error.html
 
 RUN mkdir -p /etc/nginx/ssl
