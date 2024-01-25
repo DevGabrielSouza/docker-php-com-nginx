@@ -53,6 +53,17 @@ RUN rm -rf /etc/nginx/sites-enabled/* && rm -rf /etc/nginx/sites-available/*
 COPY ./docker/nginx/sites.conf /etc/nginx/sites-enabled/default.conf
 COPY ./docker/nginx/error.html /var/www/html/error.html
 
+# Configuração do Nginx com SSL
+COPY ./docker/nginx/default.conf /etc/nginx/sites-available/default
+RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+COPY ./docker/nginx/error.html /var/www/html/error.html
+
+# Geração de certificado SSL (substitua pelos seus próprios certificados em produção)
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/private.key -out /etc/nginx/ssl/public.crt -subj "/C=BR/ST=Sao_Paulo/L=Porto_Ferreira/O=Brothers_Barbearia/OU=Barbeiros/CN=api.brothersbarbearia.com.br"
+
+
+
+
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # RUN apt update -y && apt install nano git -y
 
