@@ -53,13 +53,12 @@ RUN composer install --no-interaction
 RUN apt-get install nginx certbot python3-certbot-nginx -y
 RUN rm -rf /etc/nginx/sites-enabled/* && rm -rf /etc/nginx/sites-available/*
 
+# Geração de certificado SSL usando o Certbot
+RUN certbot certonly --non-interactive --agree-tos --domains api.brothersbarbearia.com.br --email contato@brothersbarbearia.com.br --nginx
+
 # Configuração do Nginx
 COPY ./docker/nginx/sites.conf /etc/nginx/sites-enabled/default
 COPY ./docker/nginx/error.html /var/www/html/error.html
-
-# Configuração do Certbot para obter e configurar certificados
-RUN mkdir -p /etc/nginx/ssl
-RUN certbot --nginx --non-interactive --agree-tos --domains api.brothersbarbearia.com.br --email seu_email@example.com
 
 # Limpeza do apt
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
